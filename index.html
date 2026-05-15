@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <link rel="manifest" href="manifest.json"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Color Story · 色彩分析</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vibrant/3.1.6/Vibrant.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
-
+ 
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
       --bg:#f7f5f0;--text:#1c1c1c;--text2:#888;
       --radius:16px;--font-display:'DM Serif Display',serif;--font-body:'DM Sans',sans-serif;
     }
     body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;padding:2rem 1rem 4rem;display:flex;flex-direction:column;align-items:center;}
-
+ 
     h1{font-family:var(--font-display);font-size:2rem;font-weight:400;letter-spacing:-0.01em;margin-bottom:0.2rem;text-align:center}
     .sub{font-size:12px;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2rem;text-align:center}
-
+ 
     /* Upload zone */
     .upload-zone{
       width:100%;max-width:560px;
@@ -38,18 +37,18 @@
     .upload-icon{font-size:2rem;margin-bottom:0.75rem;opacity:0.4}
     .upload-text{font-size:14px;color:var(--text2)}
     .upload-text strong{color:var(--text);font-weight:500}
-
+ 
     /* Preview */
     .preview-wrap{width:100%;max-width:560px;margin-bottom:1.5rem;display:none}
     .preview-img{width:100%;max-height:360px;object-fit:cover;border-radius:20px;display:block}
-
+ 
     /* Palette strip */
     .palette-strip{display:flex;width:100%;max-width:560px;height:64px;border-radius:14px;overflow:hidden;margin-bottom:1rem;display:none}
     .palette-swatch{flex:1;transition:flex .4s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative}
     .palette-swatch:hover{flex:2.5}
     .palette-swatch .sw-hex{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:500;letter-spacing:0.04em;opacity:0;transition:opacity .2s;white-space:nowrap;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,0.25);color:#fff}
     .palette-swatch:hover .sw-hex{opacity:1}
-
+ 
     /* Color cards */
     .colors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;width:100%;max-width:560px;margin-bottom:1.5rem;display:none}
     .color-card{border-radius:14px;overflow:hidden;background:white;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
@@ -58,7 +57,7 @@
     .color-hex{font-size:13px;font-weight:500;letter-spacing:0.04em;margin-bottom:2px}
     .color-name{font-size:11px;color:var(--text2);margin-bottom:4px}
     .color-vals{font-size:10px;color:#aaa;line-height:1.5}
-
+ 
     /* Harmony analysis */
     .harmony-wrap{width:100%;max-width:560px;display:none}
     .harmony-card{background:white;border-radius:20px;padding:1.5rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:10px}
@@ -67,10 +66,33 @@
     .harmony-dots{display:flex;gap:8px;flex-wrap:wrap}
     .harmony-dot{width:32px;height:32px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.12)}
     .tag{display:inline-block;font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(0,0,0,0.06);color:var(--text2);margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase}
-
+ 
     /* Reset btn */
-    .reset-btn{display:none;margin-top:0.5rem;font-size:12px;color:var(--text2);background:none;border:none;cursor:pointer;letter-spacing:0.06em;text-transform:uppercase;text-decoration:underline;font-family:var(--font-body)}
-
+    .reset-btn{
+      display:none;
+      margin-top:1.25rem;
+      font-size:13px;
+      font-weight:500;
+      color:var(--text);
+      background:white;
+      border:1px solid rgba(0,0,0,0.1);
+      border-radius:12px;
+      padding:10px 20px;
+      cursor:pointer;
+      font-family:var(--font-body);
+      box-shadow:0 2px 8px rgba(0,0,0,0.06);
+      display:none;
+      align-items:center;
+      gap:8px;
+      transition:background .15s, box-shadow .15s, transform .15s;
+    }
+    .reset-btn:hover{background:#f7f5f0;box-shadow:0 4px 14px rgba(0,0,0,0.1);transform:translateY(-1px)}
+    .reset-btn:active{transform:scale(0.97)}
+    .reset-btn svg{flex-shrink:0}
+    .ui-tab{font-size:12px;font-weight:500;padding:7px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:white;color:#888;cursor:pointer;font-family:var(--font-body);transition:all .15s}
+    .ui-tab.active{background:#1c1c1c;color:white;border-color:#1c1c1c}
+    .ui-tab:hover:not(.active){background:#f0ede8;color:#444}
+ 
     @media(max-width:480px){
       h1{font-size:1.6rem}
       .colors-grid{grid-template-columns:repeat(2,1fr)}
@@ -78,28 +100,40 @@
   </style>
 </head>
 <body>
-
+ 
 <h1>Color Story</h1>
 <p class="sub">场景色彩分析</p>
-
+ 
 <div class="upload-zone" id="upload-zone">
   <input type="file" id="file-input" accept="image/*" capture="environment"/>
   <div class="upload-icon">⬡</div>
   <p class="upload-text"><strong>点击上传或拍照</strong></p>
   <p class="upload-text" style="margin-top:4px;font-size:12px">支持 JPG、PNG、HEIC</p>
 </div>
-
+ 
 <div class="preview-wrap" id="preview-wrap">
   <img class="preview-img" id="preview-img" />
 </div>
-
+ 
 <div class="palette-strip" id="palette-strip"></div>
 <div class="colors-grid" id="colors-grid"></div>
 <div class="harmony-wrap" id="harmony-wrap"></div>
-<button class="reset-btn" id="reset-btn" onclick="reset()">重新上传</button>
-
+<div id="ui-preview-wrap" style="display:none;width:100%;max-width:560px;margin-top:1.5rem">
+  <div style="font-size:11px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px">UI 配色样例</div>
+  <div id="ui-tabs" style="display:flex;gap:6px;margin-bottom:12px">
+    <button class="ui-tab active" onclick="switchTab(0)" data-idx="0">📱 App</button>
+    <button class="ui-tab" onclick="switchTab(1)" data-idx="1">🌐 网页</button>
+    <button class="ui-tab" onclick="switchTab(2)" data-idx="2">📊 看板</button>
+  </div>
+  <div id="ui-preview"></div>
+</div>
+<button class="reset-btn" id="reset-btn" onclick="reset()">
+  <span style="font-size:15px;line-height:1">↺</span>
+  重新上传
+</button>
+ 
 <canvas id="canvas" style="display:none"></canvas>
-
+ 
 <script>
   const COLOR_NAMES = {
     red:['大红','深红','玫红','砖红','酒红'],
@@ -115,7 +149,7 @@
     white:['象牙白','米白','雪白','奶白','珍珠'],
     black:['炭黑','深黑','墨色','夜黑','乌黑'],
   };
-
+ 
   function getColorName(hex) {
     const c = chroma(hex);
     const h = c.get('hsl.h'), s = c.get('hsl.s'), l = c.get('hsl.l');
@@ -136,7 +170,117 @@
     const idx = Math.min(Math.floor(l * names.length), names.length - 1);
     return names[idx];
   }
-
+ 
+  // ── Color Role Assignment ─────────────────────────────────────────
+  function assignRoles(hexes) {
+    if (hexes.length < 2) return [];
+ 
+    const colors = hexes.map(h => ({
+      hex: h,
+      h: chroma(h).get('hsl.h') || 0,
+      s: chroma(h).get('hsl.s'),
+      l: chroma(h).get('hsl.l'),
+      lab: chroma(h).lab(),
+    }));
+ 
+    // Sort by saturation descending to find accent candidates
+    const bySat  = [...colors].sort((a,b) => b.s - a.s);
+    const byLum  = [...colors].sort((a,b) => b.l - a.l);
+    const avgSat = colors.reduce((s,c)=>s+c.s,0)/colors.length;
+    const lumSpread = byLum[0].l - byLum[byLum.length-1].l;
+ 
+    const roles = [];
+ 
+    // PRIMARY — highest luminance that isn't too saturated (background/base)
+    const primary = byLum.find(c => c.s < 0.45) || byLum[0];
+    roles.push({
+      role: '主色',
+      tag: 'PRIMARY',
+      hex: primary.hex,
+      usage: '大面积底色、背景、页面基调',
+      tip: getTip('primary', primary),
+    });
+ 
+    // NEUTRAL — lowest saturation (text/border/divider)
+    const neutral = [...colors].sort((a,b)=>a.s-b.s).find(c=>c.hex!==primary.hex);
+    if (neutral) {
+      roles.push({
+        role: '中性色',
+        tag: 'NEUTRAL',
+        hex: neutral.hex,
+        usage: '正文文字、边框、分割线',
+        tip: getTip('neutral', neutral),
+      });
+    }
+ 
+    // SECONDARY — mid saturation, mid luminance
+    const secondary = colors.find(c =>
+      c.hex !== primary.hex &&
+      c.hex !== (neutral?.hex) &&
+      c.s > 0.1 && c.s < 0.7
+    ) || colors.find(c => c.hex !== primary.hex && c.hex !== neutral?.hex);
+    if (secondary) {
+      roles.push({
+        role: '辅色',
+        tag: 'SECONDARY',
+        hex: secondary.hex,
+        usage: '卡片背景、次级元素、模块分区',
+        tip: getTip('secondary', secondary),
+      });
+    }
+ 
+    // ACCENT — highest saturation (CTA, emphasis, icon)
+    const accent = bySat.find(c =>
+      c.hex !== primary.hex &&
+      c.hex !== (neutral?.hex) &&
+      c.hex !== (secondary?.hex)
+    ) || bySat[0];
+    if (accent && accent.hex !== primary.hex) {
+      roles.push({
+        role: '点缀色',
+        tag: 'ACCENT',
+        hex: accent.hex,
+        usage: '按钮、强调文字、icon、高亮',
+        tip: getTip('accent', accent),
+      });
+    }
+ 
+    return roles;
+  }
+ 
+  function getTip(role, c) {
+    const warm = c.h < 60 || c.h > 300;
+    const cool = c.h > 160 && c.h < 260;
+    const neutral = c.s < 0.15;
+    const dark = c.l < 0.35;
+    const light = c.l > 0.75;
+ 
+    if (role === 'primary') {
+      if (light && neutral) return '浅中性色，适合作为页面底色，视觉轻盈不抢眼';
+      if (dark) return '深色底，适合暗色系设计，文字建议用浅色';
+      if (warm && light) return '暖色调底，给人温暖亲切感，适合品牌主页';
+      return '可作为大面积背景色，奠定整体基调';
+    }
+    if (role === 'neutral') {
+      if (dark) return '深中性色，适合正文文字，对比度高易阅读';
+      if (light) return '浅中性色，适合分割线、placeholder、次要文字';
+      return '适合边框、图标轮廓或次要信息';
+    }
+    if (role === 'secondary') {
+      if (warm) return '暖辅色，与主色形成温度呼应，适合卡片或标签背景';
+      if (cool) return '冷辅色，与主色形成冷暖对比，增加层次感';
+      return '可用于次级区块或悬停状态，丰富画面层次';
+    }
+    if (role === 'accent') {
+      if (c.s > 0.7) return '高饱和点缀色，视觉冲击强，少量使用即可，适合 CTA 按钮';
+      if (warm) return '暖调强调色，吸引注意力，适合重要操作按钮或高亮文字';
+      if (cool) return '冷调强调色，理性专业感，适合科技或金融类产品';
+      return '适合强调关键信息或可交互元素';
+    }
+    return '';
+  }
+ 
+  // ── Harmony Analysis ──────────────────────────────────────────────
   function analyzeHarmony(hexes) {
     if (hexes.length < 2) return [];
     const hues = hexes.map(h => chroma(h).get('hsl.h'));
@@ -144,76 +288,62 @@
     const lums = hexes.map(h => chroma(h).get('hsl.l'));
     const avgSat = sats.reduce((a,b)=>a+b,0)/sats.length;
     const results = [];
-
-    // Hue spread
+    const hueDiffs = hues.map((h,i) => hues.map((h2,j) => i!==j ? Math.min(Math.abs(h-h2), 360-Math.abs(h-h2)) : 999)).flat().filter(x=>x<999);
+    const maxDiff = Math.max(...hueDiffs);
     const sortedH = [...hues].sort((a,b)=>a-b);
     const maxSpread = sortedH[sortedH.length-1] - sortedH[0];
-    const hueDiffs = hues.map((h,i) => hues.map((h2,j) => i!==j ? Math.min(Math.abs(h-h2), 360-Math.abs(h-h2)) : 999)).flat().filter(x=>x<999);
-    const minDiff = Math.min(...hueDiffs);
-    const maxDiff = Math.max(...hueDiffs);
-
+    const lumSpread = Math.max(...lums) - Math.min(...lums);
+ 
     if (maxSpread < 30 || maxDiff < 35) {
-      results.push({
-        type:'同类色搭配',
-        tag:'ANALOGOUS',
-        desc:'图中色彩色相接近，整体和谐统一，营造出宁静、内敛的视觉氛围。常见于自然风光和极简风格。',
-        colors: hexes,
-      });
+      results.push({ type:'同类色', tag:'ANALOGOUS', desc:'色相高度一致，整体和谐内敛，适合极简或自然风格设计，可直接作为一套单色系配色方案使用。', colors:hexes });
     }
     if (maxDiff > 150 && maxDiff < 210) {
-      results.push({
-        type:'互补色搭配',
-        tag:'COMPLEMENTARY',
-        desc:'色轮上相对的两种颜色同时出现，形成强烈的视觉张力与对比，让画面充满活力与戏剧感。',
-        colors: hexes,
-      });
+      results.push({ type:'互补对比', tag:'COMPLEMENTARY', desc:'存在色轮对角关系，视觉张力强。设计中建议以一色为主（70%）、互补色为点缀（10%），避免等量使用造成冲突。', colors:hexes });
     }
     if (maxDiff > 100 && maxDiff < 150) {
-      results.push({
-        type:'分裂互补',
-        tag:'SPLIT-COMPLEMENTARY',
-        desc:'主色与互补色两侧的颜色搭配，既有对比又不过于刺激，是摄影中常见的平衡配色方式。',
-        colors: hexes,
-      });
+      results.push({ type:'分裂互补', tag:'SPLIT-COMP', desc:'主色与两侧近补色的组合，对比丰富但不刺激，是设计中最易驾驭的对比配色之一。', colors:hexes });
     }
     if (avgSat < 0.18) {
-      results.push({
-        type:'低饱和配色',
-        tag:'MUTED / DESATURATED',
-        desc:'整体色调柔和克制，饱和度低，呈现出胶片感或雾面质感，适合人文、纪实风格。',
-        colors: hexes,
-      });
+      results.push({ type:'低饱和系', tag:'MUTED', desc:'整体饱和度克制，呈现莫兰迪或胶片质感，高级感强。适合品牌视觉、海报、或需要沉静氛围的产品界面。', colors:hexes });
     }
     if (avgSat > 0.6 && maxSpread > 60) {
-      results.push({
-        type:'高饱和撞色',
-        tag:'VIBRANT',
-        desc:'高饱和度的多种颜色共存，画面充满能量与视觉冲击力，常见于街头、节日或热带风光。',
-        colors: hexes,
-      });
+      results.push({ type:'高饱和撞色', tag:'VIBRANT', desc:'多个高饱和色共存，视觉冲击力强。设计中需要明确主次关系，适合潮牌、节日活动或年轻化产品。', colors:hexes });
     }
-    const lumSpread = Math.max(...lums) - Math.min(...lums);
     if (lumSpread > 0.55) {
-      results.push({
-        type:'明暗对比',
-        tag:'HIGH CONTRAST',
-        desc:'画面中明区与暗区并存，对比强烈，有助于突出主体，增强空间感与戏剧性。',
-        colors: hexes,
-      });
+      results.push({ type:'强明暗对比', tag:'HIGH CONTRAST', desc:'明暗跨度大，层次感强，文字可读性好。适合需要清晰信息层级的 UI 设计或印刷物。', colors:hexes });
     }
-    // Always give at least one result
     if (results.length === 0) {
-      results.push({
-        type:'自然色调',
-        tag:'NATURAL',
-        desc:'色彩分布自然均衡，没有明显的对比或统一倾向，呈现出真实、平和的视觉感受。',
-        colors: hexes,
-      });
+      results.push({ type:'自然色调', tag:'BALANCED', desc:'色彩分布均衡，没有强烈倾向，呈现真实自然的视觉感受。适合作为通用配色起点进一步调整。', colors:hexes });
     }
     return results;
   }
-
-  function extractColors(img, count=6) {
+ 
+  async function extractColors(img) {
+    // Try Vibrant.js first — it finds perceptually important colors
+    return new Promise(resolve => {
+      try {
+        const v = new Vibrant(img, { colorCount: 64, quality: 3 });
+        v.getPalette((err, palette) => {
+          if (err || !palette) { resolve(kmeans(img)); return; }
+          const order = ['Vibrant','DarkVibrant','LightVibrant','Muted','DarkMuted','LightMuted'];
+          let hexes = order
+            .map(k => palette[k])
+            .filter(Boolean)
+            .map(s => { const [r,g,b] = s.getRgb(); return chroma(Math.round(r),Math.round(g),Math.round(b),'rgb').hex(); });
+          // Remove near-duplicates
+          const unique = [];
+          hexes.forEach(h => {
+            if (!unique.some(u => chroma.distance(h, u, 'lab') < 18)) unique.push(h);
+          });
+          unique.sort((a,b) => chroma(b).get('hsl.l') - chroma(a).get('hsl.l'));
+          resolve(unique.length >= 3 ? unique : kmeans(img));
+        });
+      } catch(e) { resolve(kmeans(img)); }
+    });
+  }
+ 
+  // Saturation-weighted k-means fallback
+  function kmeans(img, count=6) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const MAX = 200;
@@ -222,44 +352,25 @@
     canvas.height = img.naturalHeight * scale;
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-
-    // Sample pixels
     const pixels = [];
-    for (let i = 0; i < data.length; i += 4*4) {
+    for (let i = 0; i < data.length; i += 16) {
       const r=data[i],g=data[i+1],b=data[i+2],a=data[i+3];
       if (a < 128) continue;
-      pixels.push([r,g,b]);
+      const w = Math.max(1, Math.round(chroma(r,g,b,'rgb').get('hsl.s') * 4));
+      for (let j=0; j<w; j++) pixels.push([r,g,b]);
     }
-
-    // k-means clustering
     function dist(a,b){ return Math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2) }
-    // init centroids spread across samples
     const step = Math.floor(pixels.length / count);
-    let centroids = Array.from({length:count},(_,i)=>[...pixels[i*step]||pixels[0]]);
-
-    for (let iter=0; iter<12; iter++) {
-      const clusters = Array.from({length:count},()=>[]);
-      pixels.forEach(p=>{
-        let best=0, bd=Infinity;
-        centroids.forEach((c,i)=>{ const d=dist(p,c); if(d<bd){bd=d;best=i} });
-        clusters[best].push(p);
-      });
-      centroids = clusters.map((cl,i)=>{
-        if(!cl.length) return centroids[i];
-        return [
-          cl.reduce((s,p)=>s+p[0],0)/cl.length,
-          cl.reduce((s,p)=>s+p[1],0)/cl.length,
-          cl.reduce((s,p)=>s+p[2],0)/cl.length,
-        ];
-      });
+    let c = Array.from({length:count},(_,i)=>[...pixels[Math.min(i*step,pixels.length-1)]]);
+    for (let iter=0; iter<15; iter++) {
+      const cl = Array.from({length:count},()=>[]);
+      pixels.forEach(p=>{ let b=0,bd=Infinity; c.forEach((x,i)=>{const d=dist(p,x);if(d<bd){bd=d;b=i}}); cl[b].push(p); });
+      c = cl.map((g,i)=>g.length?[g.reduce((s,p)=>s+p[0],0)/g.length,g.reduce((s,p)=>s+p[1],0)/g.length,g.reduce((s,p)=>s+p[2],0)/g.length]:c[i]);
     }
-
-    // Sort by luminance
-    return centroids
-      .map(c=>chroma(Math.round(c[0]),Math.round(c[1]),Math.round(c[2]),'rgb').hex())
-      .sort((a,b)=>chroma(b).get('hsl.l')-chroma(a).get('hsl.l'));
+    return c.map(x=>chroma(Math.round(x[0]),Math.round(x[1]),Math.round(x[2]),'rgb').hex())
+             .sort((a,b)=>chroma(b).get('hsl.l')-chroma(a).get('hsl.l'));
   }
-
+ 
   function render(hexes) {
     // Palette strip
     const strip = document.getElementById('palette-strip');
@@ -275,7 +386,7 @@
       strip.appendChild(sw);
     });
     strip.style.display = 'flex';
-
+ 
     // Color cards
     const grid = document.getElementById('colors-grid');
     grid.innerHTML = '';
@@ -297,10 +408,43 @@
       grid.appendChild(card);
     });
     grid.style.display = 'grid';
-
-    // Harmony
+ 
+    // Harmony + Roles
     const hw = document.getElementById('harmony-wrap');
     hw.innerHTML = '';
+ 
+    // Section: Color Roles
+    const rolesSection = document.createElement('div');
+    rolesSection.innerHTML = '<div style="font-size:11px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px">色彩角色分配</div>';
+    const roles = assignRoles(hexes);
+    roles.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'harmony-card role-card';
+      const textColor = chroma(r.hex).get('hsl.l') > 0.55 ? '#1c1c1c' : '#ffffff';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div style="width:44px;height:44px;border-radius:10px;background:${r.hex};flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.12)"></div>
+          <div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+              <span class="tag" style="margin:0">${r.tag}</span>
+            </div>
+            <div class="harmony-title">${r.role}</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;font-weight:500;letter-spacing:0.04em;color:#999">${r.hex.toUpperCase()}</div>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.06em">${r.usage}</div>
+        <div class="harmony-desc" style="margin-bottom:0">${r.tip}</div>`;
+      rolesSection.appendChild(card);
+    });
+    hw.appendChild(rolesSection);
+ 
+    // Divider
+    const divider = document.createElement('div');
+    divider.style.cssText = 'font-size:11px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin:1.25rem 0 8px';
+    divider.textContent = '配色关系分析';
+    hw.appendChild(divider);
+ 
+    // Section: Harmony
     const harmonies = analyzeHarmony(hexes);
     harmonies.forEach(h=>{
       const card = document.createElement('div');
@@ -314,27 +458,28 @@
       hw.appendChild(card);
     });
     hw.style.display = 'block';
-
-    document.getElementById('reset-btn').style.display = 'block';
+ 
+    renderUIPreview(hexes);
+    document.getElementById('reset-btn').style.display = 'flex';
   }
-
+ 
   document.getElementById('file-input').addEventListener('change', function(e){
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = ev => {
       const img = document.getElementById('preview-img');
-      img.onload = () => {
+      img.onload = async () => {
         document.getElementById('upload-zone').style.display = 'none';
         document.getElementById('preview-wrap').style.display = 'block';
-        const hexes = extractColors(img, 6);
+        const hexes = await extractColors(img);
         render(hexes);
       };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(file);
   });
-
+ 
   // Drag and drop
   const zone = document.getElementById('upload-zone');
   zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag') });
@@ -349,13 +494,232 @@
       document.getElementById('file-input').dispatchEvent(new Event('change'));
     }
   });
-
+ 
+  let _uiHexes = [];
+  let _currentTab = 0;
+ 
+  function switchTab(idx) {
+    _currentTab = idx;
+    document.querySelectorAll('.ui-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+    renderTab(_uiHexes, idx);
+  }
+ 
+  function renderUIPreview(hexes) {
+    _uiHexes = hexes;
+    _currentTab = 0;
+    document.querySelectorAll('.ui-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+    document.getElementById('ui-preview-wrap').style.display = 'block';
+    renderTab(hexes, 0);
+  }
+ 
+  function renderTab(hexes, idx) {
+    const roles = assignRoles(hexes);
+    const get = tag => roles.find(r => r.tag === tag)?.hex || hexes[0];
+    const P = get('PRIMARY');
+    const N = get('NEUTRAL');
+    const S = get('SECONDARY') || hexes[1] || hexes[0];
+    const A = get('ACCENT') || hexes[hexes.length-1];
+    const tOn = h => chroma(h).get('hsl.l') > 0.55 ? '#1c1c1c' : '#f5f5f5';
+    const dim  = h => chroma(h).get('hsl.l') > 0.55 ? 'rgba(0,0,0,0.38)' : 'rgba(255,255,255,0.45)';
+    const wrap = document.getElementById('ui-preview');
+    wrap.innerHTML = '';
+ 
+    if (idx === 0) renderApp(wrap, hexes, P, S, A, N, tOn, dim);
+    if (idx === 1) renderWeb(wrap, hexes, P, S, A, N, tOn, dim);
+    if (idx === 2) renderDashboard(wrap, hexes, P, S, A, N, tOn, dim);
+  }
+ 
+  // ── Tab 0: Mobile App ─────────────────────────────────────────────
+  function renderApp(wrap, hexes, P, S, A, N, tOn, dim) {
+    const el = document.createElement('div');
+    el.style.cssText = `background:#ffffff;border-radius:28px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12);font-family:'DM Sans',sans-serif;max-width:320px;margin:0 auto`;
+    el.innerHTML = `
+      <!-- status bar -->
+      <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11px;font-weight:600;color:#1c1c1c">9:41</span>
+        <span style="font-size:11px;color:rgba(0,0,0,0.3)">● ● ●</span>
+      </div>
+      <!-- header -->
+      <div style="padding:16px 20px 12px">
+        <div style="font-size:11px;color:rgba(0,0,0,0.35);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px">MY PALETTE</div>
+        <div style="font-size:22px;font-weight:700;color:#1c1c1c;letter-spacing:-0.03em">Color Story</div>
+      </div>
+      <!-- hero swatch -->
+      <div style="margin:0 20px 14px;border-radius:18px;overflow:hidden;height:120px;display:flex">
+        ${hexes.map(h=>`<div style="flex:1;background:${h}"></div>`).join('')}
+      </div>
+      <!-- cards row -->
+      <div style="display:flex;gap:8px;padding:0 20px 14px">
+        ${[['主色','Primary',P],['辅色','Secondary',S],['点缀','Accent',A]].map(([l,s,h])=>`
+          <div style="flex:1;background:${h};border-radius:14px;padding:10px 8px">
+            <div style="font-size:8px;color:${dim(h)};letter-spacing:0.06em;text-transform:uppercase;margin-bottom:3px">${s}</div>
+            <div style="font-size:11px;font-weight:600;color:${tOn(h)}">${l}</div>
+            <div style="font-size:9px;color:${dim(h)};margin-top:2px">${h.toUpperCase()}</div>
+          </div>`).join('')}
+      </div>
+      <!-- content card -->
+      <div style="margin:0 20px 14px;background:${S};border-radius:18px;padding:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:36px;height:36px;border-radius:10px;background:${A}"></div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:${tOn(S)}">Scene Analysis</div>
+            <div style="font-size:11px;color:${dim(S)}">提取到 ${hexes.length} 种色彩</div>
+          </div>
+          <div style="margin-left:auto;font-size:18px;color:${A}">→</div>
+        </div>
+        ${hexes.slice(0,3).map((h,i)=>{
+          const pct=[65,40,22][i];
+          return `<div style="margin-bottom:5px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+              <span style="font-size:9px;color:${dim(S)}">${['主色','辅色','点缀'][i]}</span>
+              <span style="font-size:9px;color:${dim(S)}">${pct}%</span>
+            </div>
+            <div style="height:3px;border-radius:2px;background:rgba(0,0,0,0.08)">
+              <div style="height:100%;width:${pct}%;background:${h};border-radius:2px"></div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <!-- CTA + bottom nav -->
+      <div style="padding:0 20px 16px">
+        <button style="width:100%;padding:14px;border-radius:14px;border:none;background:${A};color:${tOn(A)};font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;letter-spacing:0.01em">导出配色方案</button>
+      </div>
+      <div style="background:#f7f5f0;padding:12px 32px 20px;display:flex;justify-content:space-between;border-top:1px solid rgba(0,0,0,0.06)">
+        ${['⬡','◎','◈','⊕'].map((icon,i)=>`
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <div style="font-size:20px;color:${i===0?A:'rgba(0,0,0,0.25)'}">${icon}</div>
+            <div style="width:4px;height:4px;border-radius:50%;background:${i===0?A:'transparent'}"></div>
+          </div>`).join('')}
+      </div>`;
+    wrap.appendChild(el);
+    addSceneLabel(wrap, '适合感受配色在手机端的密度与对比关系');
+  }
+ 
+  // ── Tab 1: Landing Page ───────────────────────────────────────────
+  function renderWeb(wrap, hexes, P, S, A, N, tOn, dim) {
+    const el = document.createElement('div');
+    el.style.cssText = `background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);font-family:'DM Serif Display',serif`;
+    const bodyColor = chroma(N).get('hsl.l') < 0.45 ? N : '#1c1c1c';
+    el.innerHTML = `
+      <!-- nav -->
+      <div style="padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,0,0,0.06)">
+        <div style="font-size:14px;font-weight:600;color:#1c1c1c;font-family:'DM Sans',sans-serif;letter-spacing:-0.01em">Color Story</div>
+        <div style="display:flex;gap:16px">
+          ${['Gallery','About','Export'].map(t=>`<span style="font-size:11px;color:rgba(0,0,0,0.4);font-family:'DM Sans',sans-serif;cursor:pointer">${t}</span>`).join('')}
+          <div style="background:${A};color:${tOn(A)};font-size:11px;font-family:'DM Sans',sans-serif;font-weight:600;padding:5px 12px;border-radius:20px;cursor:pointer">Try Free</div>
+        </div>
+      </div>
+      <!-- hero -->
+      <div style="padding:40px 24px 32px;display:flex;gap:20px;align-items:center">
+        <div style="flex:1">
+          <div style="display:inline-block;background:${S};color:${tOn(S)};font-size:10px;font-family:'DM Sans',sans-serif;font-weight:500;padding:4px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:0.06em;text-transform:uppercase">NEW · Color Analysis</div>
+          <div style="font-size:28px;font-weight:400;color:#1c1c1c;line-height:1.15;margin-bottom:10px;letter-spacing:-0.02em">See the colors<br><em>behind every scene</em></div>
+          <div style="font-size:12px;color:rgba(0,0,0,0.45);line-height:1.6;font-family:'DM Sans',sans-serif;margin-bottom:20px">Upload any photo and instantly reveal its color palette, harmony relationships, and design applications.</div>
+          <div style="display:flex;gap:8px">
+            <button style="padding:11px 20px;border-radius:12px;border:none;background:${A};color:${tOn(A)};font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer">Upload Photo</button>
+            <button style="padding:11px 20px;border-radius:12px;border:1px solid rgba(0,0,0,0.12);background:transparent;color:#1c1c1c;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer">See Examples →</button>
+          </div>
+        </div>
+        <!-- color wheel preview -->
+        <div style="width:120px;height:120px;border-radius:50%;overflow:hidden;flex-shrink:0;display:flex;flex-wrap:wrap;box-shadow:0 4px 20px rgba(0,0,0,0.15)">
+          ${hexes.map(h=>`<div style="width:50%;height:50%;background:${h}"></div>`).join('')}
+        </div>
+      </div>
+      <!-- feature cards -->
+      <div style="display:flex;gap:8px;padding:0 24px 24px">
+        ${[['⬡','色彩提取','智能识别画面中的主色与点缀色'],['◎','配色分析','分析同类色、互补色等色彩关系'],['◈','角色分配','自动分配主色、辅色与强调色']].map(([icon,title,desc],i)=>`
+          <div style="flex:1;background:${i===0?A:S};border-radius:14px;padding:14px">
+            <div style="font-size:20px;margin-bottom:8px">${icon}</div>
+            <div style="font-size:12px;font-weight:600;color:${tOn(i===0?A:S)};margin-bottom:4px;font-family:'DM Sans',sans-serif">${title}</div>
+            <div style="font-size:10px;color:${dim(i===0?A:S)};line-height:1.5;font-family:'DM Sans',sans-serif">${desc}</div>
+          </div>`).join('')}
+      </div>`;
+    wrap.appendChild(el);
+    addSceneLabel(wrap, '适合判断配色在品牌网站大面积使用时的视觉感受');
+  }
+ 
+  // ── Tab 2: Dashboard ──────────────────────────────────────────────
+  function renderDashboard(wrap, hexes, P, S, A, N, tOn, dim) {
+    const el = document.createElement('div');
+    const darkBg = '#ffffff';
+    el.style.cssText = `background:${darkBg};border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.12);font-family:'DM Sans',sans-serif`;
+    const bodyT = tOn(darkBg);
+    const dimT  = dim(darkBg);
+ 
+    const statColors = [A, S, ...hexes].filter((h,i,a)=>a.indexOf(h)===i);
+ 
+    el.innerHTML = `
+      <!-- sidebar + main -->
+      <div style="display:flex;min-height:320px">
+        <!-- sidebar -->
+        <div style="width:52px;background:${P};padding:16px 0;display:flex;flex-direction:column;align-items:center;gap:16px;flex-shrink:0">
+          <div style="font-size:18px;color:${tOn(P)}">⬡</div>
+          ${['◎','◈','⊕','○'].map((icon,i)=>`<div style="font-size:16px;color:${i===0?A:'rgba(0,0,0,0.25)'};cursor:pointer">${icon}</div>`).join('')}
+        </div>
+        <!-- main -->
+        <div style="flex:1;padding:16px;overflow:hidden">
+          <!-- header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <div>
+              <div style="font-size:10px;color:rgba(0,0,0,0.35);letter-spacing:0.08em;text-transform:uppercase">COLOR ANALYTICS</div>
+              <div style="font-size:16px;font-weight:600;color:#1c1c1c;letter-spacing:-0.02em">Scene Dashboard</div>
+            </div>
+            <div style="background:${A};color:${tOn(A)};font-size:10px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer">+ Export</div>
+          </div>
+          <!-- stat cards -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+            ${[['色彩数量',hexes.length+'色','↑'],['主色饱和',Math.round(chroma(hexes[0]).get('hsl.s')*100)+'%','→'],['明暗跨度',Math.round((chroma(hexes[0]).get('hsl.l')-chroma(hexes[hexes.length-1]).get('hsl.l'))*100)+'%','↑']].map(([label,val,trend],i)=>`
+              <div style="background:#f7f5f0;border-radius:10px;padding:10px">
+                <div style="font-size:9px;color:rgba(0,0,0,0.35);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">${label}</div>
+                <div style="font-size:18px;font-weight:700;color:${statColors[i]||A}">${val}</div>
+                <div style="font-size:9px;color:rgba(0,0,0,0.35)">${trend} 本次分析</div>
+              </div>`).join('')}
+          </div>
+          <!-- color bars -->
+          <div style="background:#f7f5f0;border-radius:12px;padding:12px;margin-bottom:10px">
+            <div style="font-size:10px;color:rgba(0,0,0,0.35);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px">色彩分布</div>
+            ${hexes.map((h,i)=>{
+              const pct = Math.round(100/(hexes.length) * (hexes.length-i) * 0.7 + 10);
+              const role = ['主色','辅色','点缀色','中性','其他'][i]||'—';
+              return `<div style="margin-bottom:7px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+                  <div style="display:flex;align-items:center;gap:6px">
+                    <div style="width:10px;height:10px;border-radius:3px;background:${h};flex-shrink:0"></div>
+                    <span style="font-size:10px;color:#1c1c1c">${role}</span>
+                    <span style="font-size:9px;color:rgba(0,0,0,0.35)">${h.toUpperCase()}</span>
+                  </div>
+                  <span style="font-size:10px;color:rgba(0,0,0,0.35)">${pct}%</span>
+                </div>
+                <div style="height:3px;border-radius:2px;background:rgba(0,0,0,0.08)">
+                  <div style="height:100%;width:${pct}%;background:${h};border-radius:2px;opacity:0.9"></div>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+          <!-- bottom tags -->
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            ${hexes.map(h=>`<div style="background:${h};color:${tOn(h)};font-size:9px;font-weight:600;padding:3px 8px;border-radius:6px;letter-spacing:0.04em">${h.toUpperCase()}</div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+    wrap.appendChild(el);
+    addSceneLabel(wrap, '适合判断配色能否支撑复杂信息层级与数据可视化');
+  }
+ 
+  function addSceneLabel(wrap, text) {
+    const label = document.createElement('div');
+    label.style.cssText = 'font-size:11px;color:#bbb;text-align:center;margin-top:10px;padding:0 8px;line-height:1.5';
+    label.textContent = text;
+    wrap.appendChild(label);
+  }
+ 
   function reset() {
     document.getElementById('upload-zone').style.display = 'block';
     document.getElementById('preview-wrap').style.display = 'none';
     document.getElementById('palette-strip').style.display = 'none';
     document.getElementById('colors-grid').style.display = 'none';
     document.getElementById('harmony-wrap').style.display = 'none';
+    document.getElementById('ui-preview-wrap').style.display = 'none';
     document.getElementById('reset-btn').style.display = 'none';
     document.getElementById('file-input').value = '';
   }
